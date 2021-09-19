@@ -1,0 +1,60 @@
+{
+  "nodes": {
+    "flake-utils": {
+      "locked": {
+        "lastModified": 1631561581,
+        "narHash": "sha256-3VQMV5zvxaVLvqqUrNz3iJelLw30mIVSfZmAaauM3dA=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "7e5bf3925f6fbdfaf50a2a7ca0be2879c4261d19",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1632025165,
+        "narHash": "sha256-vFHkvmdwbJAFg2d60CQ4fbqpEAUFXR0SO3HRWI4+bXM=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "a54d2e72e282f2bc68c49f82c735cf664244ec75",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "nixpkgs": "nixpkgs",
+        "solanaSrc": "solanaSrc"
+      }
+    },
+    "solanaSrc": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1631976986,
+        "narHash": "sha256-Gu+/clanMBoIxFDJG3KAx0FfI+bD2kr2nfLUBbxWSxk=",
+        "owner": "solana-labs",
+        "repo": "solana",
+        "rev": "bed0049a5118d7f02263225a54b083e7558ad20d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "solana-labs",
+        "repo": "solana",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
