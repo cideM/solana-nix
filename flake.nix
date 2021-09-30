@@ -11,6 +11,12 @@
       let
         pkgs = import nixpkgs { inherit system; };
 
+        meta = with pkgs.stdenv; with pkgs.lib; {
+          homepage = "https://solana.com/";
+          description = "Solana is a decentralized blockchain built to enable scalable, user-friendly apps for the world.";
+          platforms = platforms.unix ++ platforms.darwin;
+        };
+
         # I don't know how to build from source on Darwin
         # https://discourse.nixos.org/t/ld-framework-not-found-system/15096
         # On NixOS the build got to the test stage but then failed at:
@@ -32,6 +38,7 @@
         # person had to remove some tests and comment some out.
         # https://github.com/NixOS/nixpkgs/pull/121009/files
         solanaFromSource = pkgs.rustPlatform.buildRustPackage rec {
+          inherit meta;
           pname = "solana";
           version = "1.8.0";
           src = solanaSrc;
@@ -82,10 +89,10 @@
           };
           in
           with pkgs.stdenv; with pkgs.lib; pkgs.stdenv.mkDerivation {
+            inherit meta;
+
             name = "solana-cli-bin";
-
             version = "1.6.27";
-
             src = sources.${system};
 
             installPhase = ''
@@ -99,9 +106,7 @@
             '';
 
             nativeBuildInputs = optional (! isDarwin) pkgs.autoPatchelfHook;
-
             autoPatchelfIgnoreMissingDeps = true;
-
             # These are missing but I don't think they're in Nixpkgs
             # > autoPatchelfHook could not satisfy dependency libsgx_uae_service.so wanted by /nix/store/wf6qjpsd7d3fw0cqnxisy82a31lfv404-solana-cli-bin/bin/perf-libs/libsigning.so
             # > autoPatchelfHook could not satisfy dependency libsgx_urts.so wanted by /nix/store/wf6qjpsd7d3fw0cqnxisy82a31lfv404-solana-cli-bin/bin/perf-libs/libsigning.so
@@ -113,11 +118,6 @@
               pkg-config
             ];
 
-            meta = {
-              homepage = "https://solana.com/";
-              description = "Solana is a decentralized blockchain built to enable scalable, user-friendly apps for the world.";
-              platforms = platforms.unix ++ platforms.darwin;
-            };
           };
 
       in
