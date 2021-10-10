@@ -3,7 +3,7 @@
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
   inputs.flake-utils.url = "github:numtide/flake-utils";
-  inputs.solanaSrc.url = "github:solana-labs/solana";
+  inputs.solanaSrc.url = "github:solana-labs/solana?rev=4892eb4e1ad278d5249b6cda8983f88effb3e98b";
   inputs.solanaSrc.flake = false;
 
   outputs = { self, nixpkgs, flake-utils, solanaSrc }:
@@ -48,13 +48,13 @@
         # Here's an unfinished attempt at adding solana to Nixpkgs where the
         # person had to remove some tests and comment some out.
         # https://github.com/NixOS/nixpkgs/pull/121009/files
-        solanaFromSource = pkgs.rustPlatform.buildRustPackage
+        solana = pkgs.rustPlatform.buildRustPackage
           rec {
             inherit meta;
             pname = "solana";
-            version = "1.8.0";
+            version = "1.7.15";
             src = solanaSrc;
-            cargoSha256 = "0yahdh6pzi6xsikz7z6k72hpqv9fkph2ns3m4v99hm5j61q86nfk";
+            cargoSha256 = "1ndvqskfcix17a5h2rwcnhyq14ngcnaq9kmaq2qvxr8lgv23an21";
 
             doCheck = false;
 
@@ -63,14 +63,12 @@
             nativeBuildInputs = [
               pkgs.rustfmt
               pkgs.llvm
-              pkgs.clang
               pkgs.protobuf
               pkgs.pkg-config
             ];
 
             buildInputs = [
               pkgs.hidapi
-              pkgs.llvmPackages.libclang
               pkgs.rustfmt
               pkgs.openssl
               pkgs.zlib
@@ -80,7 +78,8 @@
 
             # This is how you should do it for Rust bindgen, instead of the
             # NIX_LDFLAGS
-            BINDGEN_EXTRA_CLANG_ARGS = "-isystem";
+            # https://github.com/NixOS/nixpkgs/issues/52447#issuecomment-853429315
+            BINDGEN_EXTRA_CLANG_ARGS = "-isystem ${pkgs.llvmPackages.libclang.lib}/lib/clang/${pkgs.lib.getVersion pkgs.clang}/include";
             LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
             LLVM_CONFIG_PATH = "${pkgs.llvm}/bin/llvm-config";
 
@@ -90,7 +89,7 @@
       in
       rec {
         packages = flake-utils.lib.flattenTree {
-          solana = solanaFromSource;
+          inherit solana;
         };
         defaultPackage = packages.solana;
         apps.solana = flake-utils.lib.mkApp { drv = packages.solana; };
