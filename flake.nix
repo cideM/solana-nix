@@ -74,7 +74,7 @@
               pkgs.zlib
             ] ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
               pkgs.darwin.apple_sdk.frameworks.System
-            ]) ++ (pkgs.lib.optionals pkgs.stdenv.isLinux pkgs.udev);
+            ]) ++ (pkgs.lib.optionals pkgs.stdenv.isLinux [pkgs.udev]);
 
             # This is how you should do it for Rust bindgen, instead of the
             # NIX_LDFLAGS
