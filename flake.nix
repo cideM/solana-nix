@@ -72,6 +72,7 @@
               pkgs.rustfmt
               pkgs.openssl
               pkgs.zlib
+              pkgs.rocksdb
             ] ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
               pkgs.darwin.apple_sdk.frameworks.System
             ]) ++ (pkgs.lib.optionals pkgs.stdenv.isLinux [pkgs.udev]);
@@ -82,6 +83,8 @@
             BINDGEN_EXTRA_CLANG_ARGS = "-isystem ${pkgs.llvmPackages.libclang.lib}/lib/clang/${pkgs.lib.getVersion pkgs.clang}/include";
             LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
             LLVM_CONFIG_PATH = "${pkgs.llvm}/bin/llvm-config";
+            ROCKSDB_INCLUDE_DIR = "${pkgs.rocksdb}/include";
+            ROCKSDB_LIB_DIR = "${pkgs.rocksdb}/lib";
 
             cargoBuildFlags = builtins.map (binName: "--bin=${binName}") endUserBins;
           };
