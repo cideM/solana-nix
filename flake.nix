@@ -19,9 +19,11 @@
           "solana-install"
           "solana-install-init"
           "solana-keygen"
+          "solana-faucet"
           "solana-stake-accounts"
-          "solana-test-validator"
           "solana-tokens"
+          # Linker error on Darwin about System framework
+          # "solana-test-validator"
         ];
 
         meta = with pkgs.stdenv; with pkgs.lib; {
@@ -30,21 +32,6 @@
           platforms = platforms.unix ++ platforms.darwin;
         };
 
-        # On NixOS the build got to the test stage but then failed at:
-        #
-        # last 10 log lines:
-        # > thread 'test::test_accounts_cluster_bench' panicked at 'Failed to open ledger database: UnableToSetOpenFileDescriptorLimit', core/src/validator.rs:1144:6
-        # > note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-        # >
-        # >
-        # > failures:
-        # >     test::test_accounts_cluster_bench
-        # >
-        # > test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.52s
-        # >
-        # > error: test failed, to rerun pass '-p solana-accounts-cluster-bench --bin solana-accounts-cluster-bench'
-        # For full logs, run 'nix log /nix/store/zpsgi4fw0bhclf2hps1vvhfbv5c71zzp-solana-latest.drv'.
-        #
         # Here's an unfinished attempt at adding solana to Nixpkgs where the
         # person had to remove some tests and comment some out.
         # https://github.com/NixOS/nixpkgs/pull/121009/files
@@ -60,31 +47,46 @@
 
             # I commented the dependencies out one by one and checked if the
             # build fails. The below is the result of that testing.
-            nativeBuildInputs = [
-              pkgs.rustfmt
-              pkgs.llvm
-              pkgs.protobuf
-              pkgs.pkg-config
+            nativeBuildInputs = with pkgs; [
+              rustfmt
+              llvm
+              clang
+              protobuf
+              pkg-config
             ];
 
-            buildInputs = [
-              pkgs.hidapi
-              pkgs.rustfmt
-              pkgs.openssl
-              pkgs.zlib
-              pkgs.rocksdb
-            ] ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
-              pkgs.darwin.apple_sdk.frameworks.System
-            ]) ++ (pkgs.lib.optionals pkgs.stdenv.isLinux [pkgs.udev]);
+            buildInputs = with pkgs; [
+              hidapi
+              rustfmt
+              libclang
+              openssl
+              zlib
+            ] ++ (with pkgs.darwin.apple_sdk.frameworks; pkgs.lib.optionals pkgs.stdenv.isDarwin [
+              System
+              IOKit
+              Security
+              CoreFoundation
+              AppKit
+            ]) ++ (pkgs.lib.optionals pkgs.stdenv.isLinux [ pkgs.udev ]);
 
-            # This is how you should do it for Rust bindgen, instead of the
-            # NIX_LDFLAGS
-            # https://github.com/NixOS/nixpkgs/issues/52447#issuecomment-853429315
-            BINDGEN_EXTRA_CLANG_ARGS = "-isystem ${pkgs.llvmPackages.libclang.lib}/lib/clang/${pkgs.lib.getVersion pkgs.clang}/include";
+            # https://hoverbear.org/blog/rust-bindgen-in-nix/
+            preBuild = with pkgs; ''
+              # From: https://github.com/NixOS/nixpkgs/blob/1fab95f5190d087e66a3502481e34e15d62090aa/pkgs/applications/networking/browsers/firefox/common.nix#L247-L253
+              # Set C flags for Rust's bindgen program. Unlike ordinary C
+              # compilation, bindgen does not invoke $CC directly. Instead it
+              # uses LLVM's libclang. To make sure all necessary flags are
+              # included we need to look in a few places.
+              export BINDGEN_EXTRA_CLANG_ARGS="$(< ${stdenv.cc}/nix-support/libc-crt1-cflags) \
+                $(< ${stdenv.cc}/nix-support/libc-cflags) \
+                $(< ${stdenv.cc}/nix-support/cc-cflags) \
+                $(< ${stdenv.cc}/nix-support/libcxx-cxxflags) \
+                ${lib.optionalString stdenv.cc.isClang "-idirafter ${stdenv.cc.cc}/lib/clang/${lib.getVersion stdenv.cc.cc}/include"} \
+                ${lib.optionalString stdenv.cc.isGNU "-isystem ${stdenv.cc.cc}/include/c++/${lib.getVersion stdenv.cc.cc} -isystem ${stdenv.cc.cc}/include/c++/${lib.getVersion stdenv.cc.cc}/${stdenv.hostPlatform.config} -idirafter ${stdenv.cc.cc}/lib/gcc/${stdenv.hostPlatform.config}/${lib.getVersion stdenv.cc.cc}/include"} \
+              "
+            '';
             LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
             LLVM_CONFIG_PATH = "${pkgs.llvm}/bin/llvm-config";
-            ROCKSDB_INCLUDE_DIR = "${pkgs.rocksdb}/include";
-            ROCKSDB_LIB_DIR = "${pkgs.rocksdb}/lib";
+            # NIX_LDFLAGS = "-F${pkgs.darwin.apple_sdk.frameworks.System}/Library/Frameworks -framework System $NIX_LDFLAGS";
 
             cargoBuildFlags = builtins.map (binName: "--bin=${binName}") endUserBins;
           };
