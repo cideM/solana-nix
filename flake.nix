@@ -23,7 +23,7 @@
           "solana-stake-accounts"
           "solana-tokens"
           # Linker error on Darwin about System framework
-          # "solana-test-validator"
+          "solana-test-validator"
         ];
 
         meta = with pkgs.stdenv; with pkgs.lib; {
@@ -84,6 +84,7 @@
             '';
             LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
             LLVM_CONFIG_PATH = "${pkgs.llvm}/bin/llvm-config";
+            NIX_LDFLAGS="-F${pkgs.darwin.apple_sdk.frameworks.System}/Library/Frameworks -framework System $NIX_LDFLAGS";
 
             cargoBuildFlags = builtins.map (binName: "--bin=${binName}") endUserBins;
           };
