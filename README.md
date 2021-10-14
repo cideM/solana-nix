@@ -43,3 +43,9 @@ git+file:///Users/fbs/private/solana-nix
     └───x86_64-linux
         └───solana: package 'solana-1.7.15'
 ```
+
+## Other Useful Links
+
+Please also see the [SaberHQ
+overlay](https://github.com/saber-hq/saber-overlay), which contains a few more
+outputs.
