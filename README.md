@@ -49,3 +49,9 @@ git+file:///Users/fbs/private/solana-nix
 Please also see the [SaberHQ
 overlay](https://github.com/saber-hq/saber-overlay), which contains a few more
 outputs.
+
+## TODO
+
+- [ ] Add a test that runs all binaries once, at least just `--version`
+- [ ] Try auto updating to latest stable release with GitHub workflow
+- [ ] Figure out how to build the missing binary on Darwin ([Discourse post](https://discourse.nixos.org/t/ld-framework-not-found-system/15096))
