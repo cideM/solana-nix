@@ -45,8 +45,6 @@
 
             doCheck = false;
 
-            # I commented the dependencies out one by one and checked if the
-            # build fails. The below is the result of that testing.
             nativeBuildInputs = with pkgs; [
               rustfmt
               llvm
@@ -86,7 +84,6 @@
             '';
             LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
             LLVM_CONFIG_PATH = "${pkgs.llvm}/bin/llvm-config";
-            # NIX_LDFLAGS = "-F${pkgs.darwin.apple_sdk.frameworks.System}/Library/Frameworks -framework System $NIX_LDFLAGS";
 
             cargoBuildFlags = builtins.map (binName: "--bin=${binName}") endUserBins;
           };
