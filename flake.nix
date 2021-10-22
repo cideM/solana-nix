@@ -102,6 +102,8 @@
             cargoBuildFlags = builtins.map (binName: "--bin=${binName}") endUserBins;
           };
 
+        fenixSystem = if system == "aarch64-darwin" then "x86_64-darwin" else "x86_64-linux";
+
       in
       rec {
         packages = flake-utils.lib.flattenTree {
@@ -112,7 +114,7 @@
         defaultApp = apps.solana;
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
-            (fenix.packages.x86_64-darwin.complete.withComponents [
+            (fenix.packages."${fenixSystem}".complete.withComponents [
               "cargo"
               "clippy"
               "rust-src"
