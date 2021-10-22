@@ -1,15 +1,24 @@
 {
   description = "Solana CLI";
 
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-  inputs.flake-utils.url = "github:numtide/flake-utils";
-  inputs.solanaSrc.url = "github:solana-labs/solana?rev=4892eb4e1ad278d5249b6cda8983f88effb3e98b";
-  inputs.solanaSrc.flake = false;
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+    solanaSrc.url = "github:solana-labs/solana?rev=4892eb4e1ad278d5249b6cda8983f88effb3e98b";
+    solanaSrc.flake = false;
+    fenix = {
+      url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
 
-  outputs = { self, nixpkgs, flake-utils, solanaSrc }:
+  outputs = { self, nixpkgs, flake-utils, solanaSrc, fenix }:
     flake-utils.lib.eachSystem [ "x86_64-linux" "x86_64-darwin" "aarch64-darwin" ] (system:
       let
-        pkgs = import nixpkgs { inherit system; };
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ fenix.overlay ];
+        };
 
         # https://github.com/solana-labs/solana/blob/master/scripts/cargo-install-all.sh#L71
         endUserBins = [
@@ -82,6 +91,11 @@
                 ${lib.optionalString stdenv.cc.isGNU "-isystem ${stdenv.cc.cc}/include/c++/${lib.getVersion stdenv.cc.cc} -isystem ${stdenv.cc.cc}/include/c++/${lib.getVersion stdenv.cc.cc}/${stdenv.hostPlatform.config} -idirafter ${stdenv.cc.cc}/lib/gcc/${stdenv.hostPlatform.config}/${lib.getVersion stdenv.cc.cc}/include"} \
               "
             '';
+
+            postInstall = ''
+              cp -r ${solanaSrc}/sdk $out/bin/sdk
+            '';
+
             LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
             LLVM_CONFIG_PATH = "${pkgs.llvm}/bin/llvm-config";
 
@@ -96,6 +110,17 @@
         defaultPackage = packages.solana;
         apps.solana = flake-utils.lib.mkApp { drv = packages.solana; };
         defaultApp = apps.solana;
+        devShell = pkgs.mkShell {
+          buildInputs = with pkgs; [
+            (fenix.packages.x86_64-darwin.complete.withComponents [
+              "cargo"
+              "clippy"
+              "rust-src"
+              "rustc"
+              "rustfmt"
+            ])
+          ];
+        };
       }
     );
 }
