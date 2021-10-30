@@ -1,0 +1,19 @@
+diff --git a/sdk/cargo-build-bpf/src/main.rs b/sdk/cargo-build-bpf/src/main.rs
+index a86fb167a..0b2845360 100644
+--- a/sdk/cargo-build-bpf/src/main.rs
++++ b/sdk/cargo-build-bpf/src/main.rs
+@@ -430,14 +430,6 @@ fn build_bpf_package(config: &Config, target_directory: &Path, package: &cargo_m
+     } else {
+         "solana-bpf-tools-linux.tar.bz2"
+     };
+-    install_if_missing(
+-        config,
+-        "bpf-tools",
+-        "v1.12",
+-        "https://github.com/solana-labs/bpf-tools/releases/download",
+-        bpf_tools_download_file_name,
+-    )
+-    .expect("Failed to install bpf-tools");
+     link_bpf_toolchain(config);
+ 
+     let llvm_bin = config

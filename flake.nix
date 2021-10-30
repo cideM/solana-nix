@@ -41,6 +41,27 @@
           platforms = platforms.unix ++ platforms.darwin;
         };
 
+        bpfTools = pkgs.stdenv.mkDerivation
+          {
+            name = "bpf-tools";
+            version = "v1.12";
+            src = builtins.fetchurl (if pkgs.stdenv.isDarwin then
+              {
+                sha256 = "1n538g50f7jscigrlhyfpd554jrha03bn80j7ly2kln87rj2a77j";
+                url = "https://github.com/solana-labs/bpf-tools/releases/download/v1.12/solana-bpf-tools-osx.tar.bz2";
+              } else {
+              # TODO: Fix
+              sha256 = "003kyr4fz5gn2qk2qccylblsrr7rcjphgfxj52d26aiajki47nzp";
+              url = "https://github.com/solana-labs/bpf-tools/releases/download/v1.12/solana-bpf-tools-linux.tar.bz2";
+            });
+            sourceRoot = ".";
+            dontBuild = true;
+            installPhase = ''
+              mkdir $out
+              cp -R . $out/
+            '';
+          };
+
         # Here's an unfinished attempt at adding solana to Nixpkgs where the
         # person had to remove some tests and comment some out.
         # https://github.com/NixOS/nixpkgs/pull/121009/files
@@ -92,8 +113,15 @@
               "
             '';
 
+            patches = [ ./patch ];
+
+            preInstall = ''
+              mkdir -p $out/bin/sdk/bpf/dependencies
+            '';
+
             postInstall = ''
-              cp -r ${solanaSrc}/sdk $out/bin/sdk
+              ${pkgs.rsync}/bin/rsync -a ${solanaSrc}/sdk $out/bin/
+              ln -s ${bpfTools} $out/bin/sdk/bpf/dependencies/bpf-tools
             '';
 
             LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
@@ -102,19 +130,18 @@
             cargoBuildFlags = builtins.map (binName: "--bin=${binName}") endUserBins;
           };
 
-        fenixSystem = if system == "aarch64-darwin" then "x86_64-darwin" else "x86_64-linux";
-
       in
       rec {
         packages = flake-utils.lib.flattenTree {
-          inherit solana;
+          inherit solana bpfTools;
         };
         defaultPackage = packages.solana;
         apps.solana = flake-utils.lib.mkApp { drv = packages.solana; };
         defaultApp = apps.solana;
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
-            (fenix.packages."${fenixSystem}".complete.withComponents [
+            fish
+            (fenix.packages.${system}.complete.withComponents [
               "cargo"
               "clippy"
               "rust-src"
