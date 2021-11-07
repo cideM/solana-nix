@@ -1,6 +1,8 @@
 {
   description = "Solana CLI";
 
+  # TODO: Test break/program on NixOS
+
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
@@ -22,7 +24,6 @@
 
         # https://github.com/solana-labs/solana/blob/master/scripts/cargo-install-all.sh#L71
         endUserBins = [
-          "cargo-build-bpf"
           "cargo-test-bpf"
           "solana"
           "solana-install"
@@ -33,13 +34,30 @@
           "solana-tokens"
           # Linker error on Darwin about System framework
           # "solana-test-validator"
-        ];
+        ] ++ (pkgs.lib.optionals (system != "aarch64-darwin") [ "cargo-build-bpf" ]);
 
         meta = with pkgs.stdenv; with pkgs.lib; {
           homepage = "https://solana.com/";
           description = "Solana is a decentralized blockchain built to enable scalable, user-friendly apps for the world.";
           platforms = platforms.unix ++ platforms.darwin;
         };
+
+        # This uses a fork of Rust and Git clone. I think it would be a
+        # ridiculous effort to compile this from source with Nix.
+        # bpfTools = pkgs.stdenv.mkDerivation
+        #   {
+        #     # TODO: Actually use the correct version
+        #     name = "bpf-tools";
+        #     version = "v1.12";
+        #     buildInputs = with pkgs; [
+        #       git
+        #     ];
+        #     buildPhase = ''
+        #       ./build.sh
+        #     '';
+        #     patches = [ ./bpf_tools_patch ];
+        #     src = bpfToolsSrc;
+        #   };
 
         bpfTools = pkgs.stdenv.mkDerivation
           {
@@ -50,7 +68,6 @@
                 sha256 = "1n538g50f7jscigrlhyfpd554jrha03bn80j7ly2kln87rj2a77j";
                 url = "https://github.com/solana-labs/bpf-tools/releases/download/v1.12/solana-bpf-tools-osx.tar.bz2";
               } else {
-              # TODO: Fix
               sha256 = "003kyr4fz5gn2qk2qccylblsrr7rcjphgfxj52d26aiajki47nzp";
               url = "https://github.com/solana-labs/bpf-tools/releases/download/v1.12/solana-bpf-tools-linux.tar.bz2";
             });
@@ -89,7 +106,7 @@
               libclang
               openssl
               zlib
-            ] ++ (with pkgs.darwin.apple_sdk.frameworks; pkgs.lib.optionals pkgs.stdenv.isDarwin [
+            ] ++ (with pkgs.darwin.apple_sdk.frameworks; pkgs.lib.optionals (system == "aarch64-darwin") [
               System
               IOKit
               Security
