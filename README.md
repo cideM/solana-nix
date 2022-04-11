@@ -1,5 +1,7 @@
 # Nix Flake For Solana
 
+**This flake is an experiment that I started out of curiosity. I don't use Solana myself. If there are better flakes out there please let me know so I can deprecate this repository and link to other solutions!**
+
 This flake packages up the [solana-cli](https://docs.solana.com/cli/install-solana-cli-tools). More specifically, it includes the following binaries:
 
 - cargo-build-bpf
