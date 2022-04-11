@@ -3,7 +3,7 @@
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
   inputs.flake-utils.url = "github:numtide/flake-utils";
-  inputs.solanaSrc.url = "github:solana-labs/solana?rev=4892eb4e1ad278d5249b6cda8983f88effb3e98b";
+  inputs.solanaSrc.url = "github:solana-labs/solana?rev=e02542003d2c7290704ce155b0dee1d176a6ab27";
   inputs.solanaSrc.flake = false;
 
   outputs = { self, nixpkgs, flake-utils, solanaSrc }:
@@ -42,9 +42,9 @@
           rec {
             inherit meta;
             pname = "solana";
-            version = "1.7.15";
+            version = "1.9.15";
             src = solanaSrc;
-            cargoSha256 = "1ndvqskfcix17a5h2rwcnhyq14ngcnaq9kmaq2qvxr8lgv23an21";
+            cargoSha256 = "1agclib7n2nsaq836vmwdzw0vsb03c1xcsih18nbsjx1jmi8yhn6";
 
             doCheck = false;
 

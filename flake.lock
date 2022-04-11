@@ -2,11 +2,11 @@
   "nodes": {
     "flake-utils": {
       "locked": {
-        "lastModified": 1631561581,
-        "narHash": "sha256-3VQMV5zvxaVLvqqUrNz3iJelLw30mIVSfZmAaauM3dA=",
+        "lastModified": 1649676176,
+        "narHash": "sha256-OWKJratjt2RW151VUlJPRALb7OU2S5s+f0vLj4o1bHM=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "7e5bf3925f6fbdfaf50a2a7ca0be2879c4261d19",
+        "rev": "a4b154ebbdc88c8498a5c7b01589addc9e9cb678",
         "type": "github"
       },
       "original": {
@@ -17,11 +17,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1632025165,
-        "narHash": "sha256-vFHkvmdwbJAFg2d60CQ4fbqpEAUFXR0SO3HRWI4+bXM=",
+        "lastModified": 1648219316,
+        "narHash": "sha256-Ctij+dOi0ZZIfX5eMhgwugfvB+WZSrvVNAyAuANOsnQ=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "a54d2e72e282f2bc68c49f82c735cf664244ec75",
+        "rev": "30d3d79b7d3607d56546dd2a6b49e156ba0ec634",
         "type": "github"
       },
       "original": {
@@ -41,17 +41,17 @@
     "solanaSrc": {
       "flake": false,
       "locked": {
-        "lastModified": 1633593557,
-        "narHash": "sha256-TqB6KHCqXKnsUnXqy8xvmDH+JNUHmFnE27sSB/V7Mg8=",
+        "lastModified": 1649463746,
+        "narHash": "sha256-haf301lOwDhB2/0BweDbrHP5wruodZo02gwlnhsG9mE=",
         "owner": "solana-labs",
         "repo": "solana",
-        "rev": "4892eb4e1ad278d5249b6cda8983f88effb3e98b",
+        "rev": "e02542003d2c7290704ce155b0dee1d176a6ab27",
         "type": "github"
       },
       "original": {
         "owner": "solana-labs",
         "repo": "solana",
-        "rev": "4892eb4e1ad278d5249b6cda8983f88effb3e98b",
+        "rev": "e02542003d2c7290704ce155b0dee1d176a6ab27",
         "type": "github"
       }
     }
