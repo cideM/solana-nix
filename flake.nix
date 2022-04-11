@@ -17,7 +17,10 @@
           "cargo-test-bpf"
           "solana"
           "solana-install"
-          "solana-install-init"
+          # This doesn't really make much sense with Nix, since it's the job of
+          # Nix and this flake to download the necessary dependencies and build
+          # the CLI commands.
+          # "solana-install-init"
           "solana-keygen"
           "solana-faucet"
           "solana-stake-accounts"
